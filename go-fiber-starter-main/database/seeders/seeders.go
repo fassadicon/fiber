@@ -32,7 +32,16 @@ func NewSeederRunner(db *gorm.DB, seeders ...Seeder) *SeederRunner {
 func All(db *gorm.DB) *SeederRunner {
 	return NewSeederRunner(db,
 		&UserSeeder{},
-		&NewsSeeder{},
-		&ProductSeeder{},
+		// &NewsSeeder{},
+		// &ProductSeeder{},
+		&AdmissionModeSeeder{},
+		&AssistedThroughSeeder{},
+		&ProgramSeeder{},
+		&AssistanceCategorySeeder{},
+		&AssistanceTypeSeeder{},
+		&ClientSeeder{},
+		&BeneficiarySeeder{},
+		&TransactionSeeder{},
+		&AssistanceSeeder{},
 	)
 }
