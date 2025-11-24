@@ -24,3 +24,12 @@ func (r *ClientBeneficiaryRepository) InsertMany(tx *gorm.DB, items []models.Cli
 
 	return nil
 }
+
+func (r *ClientBeneficiaryRepository) DeleteByComposite(clientID int, beneficiaryID int) error {
+	var item models.ClientBeneficiary
+	if err := DB.Where("client_id = ? AND beneficiary_id = ?", clientID, beneficiaryID).Delete(&item).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

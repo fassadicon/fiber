@@ -29,3 +29,30 @@ func (r *AssistanceRepository) GetListIDs(tx *gorm.DB) []int {
 
 	return ids
 }
+
+func (r *AssistanceRepository) FindByID(id int) (models.Assistance, error) {
+	var m models.Assistance
+	if err := DB.First(&m, "id = ?", id).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *AssistanceRepository) UpdateByID(tx *gorm.DB, id int, storeData models.Assistance) (models.Assistance, error) {
+	var m models.Assistance
+	if err := tx.Model(&m).Where("id = ?", id).Updates(&storeData).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *AssistanceRepository) DeleteByID(id int) error {
+	var m models.Assistance
+	if err := DB.Where("id = ?", id).Delete(&m).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

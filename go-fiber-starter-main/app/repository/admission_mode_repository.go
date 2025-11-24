@@ -38,3 +38,30 @@ func (r *AdmissionModeRepository) GetListIDs(tx *gorm.DB) []int {
 
 	return ids
 }
+
+func (r *AdmissionModeRepository) FindByID(id int) (models.AdmissionMode, error) {
+	var m models.AdmissionMode
+	if err := DB.First(&m, "id = ?", id).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *AdmissionModeRepository) UpdateByID(tx *gorm.DB, id int, storeData models.AdmissionMode) (models.AdmissionMode, error) {
+	var m models.AdmissionMode
+	if err := tx.Model(&m).Where("id = ?", id).Updates(&storeData).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *AdmissionModeRepository) DeleteByID(id int) error {
+	var m models.AdmissionMode
+	if err := DB.Where("id = ?", id).Delete(&m).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

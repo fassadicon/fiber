@@ -63,4 +63,94 @@ func Setup(app *fiber.App) {
 	// UPLOAD ROUTES
 	uploadController := new(controllers.UploadController)
 	apiRoute.Post("/cdn", uploadController.CDN)
+
+	// ADDITIONAL ENTITY ROUTES
+
+	// ADMISSION MODE
+	admissionModeGroup := apiRoute.Group("/admission-mode")
+	admissionModeController := new(controllers.AdmissionModeController)
+	admissionModeGroup.Get("/", admissionModeController.List)
+	admissionModeGroup.Get("/:id", admissionModeController.Detail)
+	admissionModeGroup.Post("/", admissionModeController.Add)
+	admissionModeGroup.Put("/:id", admissionModeController.Update)
+	admissionModeGroup.Delete("/:id", admissionModeController.Delete)
+
+	// ASSISTANCE CATEGORY
+	assistanceCatGroup := apiRoute.Group("/assistance-category")
+	assistanceCatController := new(controllers.AssistanceCategoryController)
+	assistanceCatGroup.Get("/", assistanceCatController.List)
+	assistanceCatGroup.Get("/:id", assistanceCatController.Detail)
+	assistanceCatGroup.Post("/", assistanceCatController.Add)
+	assistanceCatGroup.Put("/:id", assistanceCatController.Update)
+	assistanceCatGroup.Delete("/:id", assistanceCatController.Delete)
+
+	// ASSISTANCE TYPE
+	assistanceTypeGroup := apiRoute.Group("/assistance-type")
+	assistanceTypeController := new(controllers.AssistanceTypeController)
+	assistanceTypeGroup.Get("/", assistanceTypeController.List)
+	assistanceTypeGroup.Get("/:id", assistanceTypeController.Detail)
+	assistanceTypeGroup.Post("/", assistanceTypeController.Add)
+	assistanceTypeGroup.Put("/:id", assistanceTypeController.Update)
+	assistanceTypeGroup.Delete("/:id", assistanceTypeController.Delete)
+
+	// ASSISTED THROUGH
+	assistedThroughGroup := apiRoute.Group("/assisted-through")
+	assistedThroughController := new(controllers.AssistedThroughController)
+	assistedThroughGroup.Get("/", assistedThroughController.List)
+	assistedThroughGroup.Get("/:id", assistedThroughController.Detail)
+	assistedThroughGroup.Post("/", assistedThroughController.Add)
+	assistedThroughGroup.Put("/:id", assistedThroughController.Update)
+	assistedThroughGroup.Delete("/:id", assistedThroughController.Delete)
+
+	// PROGRAM
+	programGroup := apiRoute.Group("/program")
+	programController := new(controllers.ProgramController)
+	programGroup.Get("/", programController.List)
+	programGroup.Get("/:id", programController.Detail)
+	programGroup.Post("/", programController.Add)
+	programGroup.Put("/:id", programController.Update)
+	programGroup.Delete("/:id", programController.Delete)
+
+	// CLIENT
+	clientGroup := apiRoute.Group("/client")
+	clientController := new(controllers.ClientController)
+	clientGroup.Get("/", clientController.List)
+	clientGroup.Get("/:guid", clientController.Detail)
+	clientGroup.Post("/", clientController.Add)
+	clientGroup.Put("/:guid", clientController.Update)
+	clientGroup.Delete("/:guid", clientController.Delete)
+
+	// BENEFICIARY
+	beneficiaryGroup := apiRoute.Group("/beneficiary")
+	beneficiaryController := new(controllers.BeneficiaryController)
+	beneficiaryGroup.Get("/", beneficiaryController.List)
+	beneficiaryGroup.Get("/:guid", beneficiaryController.Detail)
+	beneficiaryGroup.Post("/", beneficiaryController.Add)
+	beneficiaryGroup.Put("/:guid", beneficiaryController.Update)
+	beneficiaryGroup.Delete("/:guid", beneficiaryController.Delete)
+
+	// CLIENT BENEFICIARY
+	cbGroup := apiRoute.Group("/client-beneficiary")
+	cbController := new(controllers.ClientBeneficiaryController)
+	cbGroup.Get("/", cbController.List)
+	cbGroup.Post("/", cbController.Add)
+	cbGroup.Delete("/:client_id/:beneficiary_id", cbController.Delete)
+
+	// TRANSACTION
+	transactionGroup := apiRoute.Group("/transaction")
+	transactionController := new(controllers.TransactionController)
+	transactionGroup.Get("/", transactionController.List)
+	transactionGroup.Get("/:id", transactionController.Detail)
+	transactionGroup.Post("/", transactionController.Add)
+	transactionGroup.Put("/:id", transactionController.Update)
+	transactionGroup.Delete("/:id", transactionController.Delete)
+
+	// ASSISTANCE
+	assistanceGroup := apiRoute.Group("/assistance")
+	assistanceController := new(controllers.AssistanceController)
+	assistanceGroup.Get("/", assistanceController.List)
+	assistanceGroup.Get("/:id", assistanceController.Detail)
+	assistanceGroup.Post("/", assistanceController.Add)
+	assistanceGroup.Put("/:id", assistanceController.Update)
+	assistanceGroup.Delete("/:id", assistanceController.Delete)
 }

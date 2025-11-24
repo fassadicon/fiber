@@ -38,3 +38,30 @@ func (r *AssistanceCategoryRepository) GetListIDs(tx *gorm.DB) []int {
 
 	return ids
 }
+
+func (r *AssistanceCategoryRepository) FindByID(id int) (models.AssistanceCategory, error) {
+	var m models.AssistanceCategory
+	if err := DB.First(&m, "id = ?", id).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *AssistanceCategoryRepository) UpdateByID(tx *gorm.DB, id int, storeData models.AssistanceCategory) (models.AssistanceCategory, error) {
+	var m models.AssistanceCategory
+	if err := tx.Model(&m).Where("id = ?", id).Updates(&storeData).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *AssistanceCategoryRepository) DeleteByID(id int) error {
+	var m models.AssistanceCategory
+	if err := DB.Where("id = ?", id).Delete(&m).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

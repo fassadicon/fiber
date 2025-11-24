@@ -29,3 +29,30 @@ func (r *ClientRepository) GetListIDs(tx *gorm.DB) []int {
 
 	return ids
 }
+
+func (r *ClientRepository) FindByGUID(guid string) (models.Client, error) {
+	var m models.Client
+	if err := DB.First(&m, "uuid = ?", guid).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *ClientRepository) UpdateByGUID(tx *gorm.DB, guid string, storeData models.Client) (models.Client, error) {
+	var m models.Client
+	if err := tx.Model(&m).Where("uuid = ?", guid).Updates(&storeData).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *ClientRepository) DeleteByGUID(guid string) error {
+	var m models.Client
+	if err := DB.Where("uuid = ?", guid).Delete(&m).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -38,3 +38,30 @@ func (r *ProgramRepository) GetListIDs(tx *gorm.DB) []int {
 
 	return ids
 }
+
+func (r *ProgramRepository) FindByID(id int) (models.Program, error) {
+	var m models.Program
+	if err := DB.First(&m, "id = ?", id).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *ProgramRepository) UpdateByID(tx *gorm.DB, id int, storeData models.Program) (models.Program, error) {
+	var m models.Program
+	if err := tx.Model(&m).Where("id = ?", id).Updates(&storeData).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *ProgramRepository) DeleteByID(id int) error {
+	var m models.Program
+	if err := DB.Where("id = ?", id).Delete(&m).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

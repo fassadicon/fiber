@@ -38,3 +38,30 @@ func (r *AssistedThroughRepository) GetListIDs(tx *gorm.DB) []int {
 
 	return ids
 }
+
+func (r *AssistedThroughRepository) FindByID(id int) (models.AssistedThrough, error) {
+	var m models.AssistedThrough
+	if err := DB.First(&m, "id = ?", id).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *AssistedThroughRepository) UpdateByID(tx *gorm.DB, id int, storeData models.AssistedThrough) (models.AssistedThrough, error) {
+	var m models.AssistedThrough
+	if err := tx.Model(&m).Where("id = ?", id).Updates(&storeData).Error; err != nil {
+		return m, err
+	}
+
+	return m, nil
+}
+
+func (r *AssistedThroughRepository) DeleteByID(id int) error {
+	var m models.AssistedThrough
+	if err := DB.Where("id = ?", id).Delete(&m).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
