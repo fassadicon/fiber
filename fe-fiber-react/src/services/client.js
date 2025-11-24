@@ -46,31 +46,7 @@ export async function getNews(token){
 export async function getUsers(token){
   return request('/api/user', {token})
 }
-
-// Products CRUD helpers
-export async function listProducts({token, page=1, per_page=10, keyword='' } = {}){
-  const q = new URLSearchParams()
-  if(page) q.set('page', page)
-  if(per_page) q.set('per_page', per_page)
-  if(keyword) q.set('keyword', keyword)
-  return request('/api/product?' + q.toString(), {token})
-}
-
-export async function getProduct(id, token){
-  return request(`/api/product/${id}`, {token})
-}
-
-export async function createProduct(payload, token){
-  return request('/api/product', {method:'POST', body: payload, token})
-}
-
-export async function updateProduct(id, payload, token){
-  return request(`/api/product/${id}`, {method:'PUT', body: payload, token})
-}
-
-export async function deleteProduct(id, token){
-  return request(`/api/product/${id}`, {method:'DELETE', token})
-}
+// Note: Product CRUD removed per request
 
 // Client CRUD helpers (client GUID-based in backend)
 export async function listClients({token, page=1, per_page=10, keyword='' } = {}){
@@ -98,6 +74,5 @@ export async function deleteClient(guid, token){
 }
 
 export default {login, register, getProducts, getNews, getUsers,
-  listProducts, getProduct, createProduct, updateProduct, deleteProduct,
   listClients, getClient, createClient, updateClient, deleteClient
 }

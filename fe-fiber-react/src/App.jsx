@@ -2,8 +2,6 @@ import React, {useState} from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Auth from './pages/Auth'
 import Home from './pages/Home'
-import ProductsList from './pages/ProductsList'
-import ProductForm from './pages/ProductForm'
 import ClientsList from './pages/ClientsList'
 import ClientForm from './pages/ClientForm'
 
@@ -28,7 +26,6 @@ export default function App(){
           <nav>
             <Link to="/auth"><button>Auth</button></Link>
             <Link to="/home"><button>Home</button></Link>
-            <Link to="/products"><button>Products</button></Link>
             <Link to="/clients"><button>Clients</button></Link>
             {token ? <button onClick={onLogout}>Logout</button> : null}
           </nav>
@@ -39,10 +36,6 @@ export default function App(){
             <Route path="/" element={<Home token={token} />} />
             <Route path="/home" element={<Home token={token} />} />
             <Route path="/auth" element={<Auth onLogin={onLogin} />} />
-
-            <Route path="/products" element={<ProductsList token={token} />} />
-            <Route path="/products/new" element={<ProductForm token={token} />} />
-            <Route path="/products/:id" element={<ProductForm token={token} />} />
 
             <Route path="/clients" element={<ClientsList token={token} />} />
             <Route path="/clients/new" element={<ClientForm token={token} />} />
