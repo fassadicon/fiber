@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 
 // Props:
 // - fetcher: async ({page, per_page, keyword, filters}) => {items, meta} OR array
@@ -11,23 +11,48 @@ export default function PaginatedList({fetcher, renderItem, perPageOptions=[10,2
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(initialPerPage)
   const [keyword, setKeyword] = useState('')
+  const [keywordDebounced, setKeywordDebounced] = useState('')
   const [total, setTotal] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  useEffect(()=>{ load() }, [page, perPage])
+  // Fetch when page/perPage/debounced keyword changes
+  const controllerRef = useRef(null)
 
-  async function load(){
+  useEffect(()=>{ fetchPage() }, [page, perPage, keywordDebounced])
+
+  // Debounce keyword input to avoid spamming backend
+  useEffect(()=>{
+    const t = setTimeout(()=>{
+      // reset to first page on new search
+      setPage(1)
+      setKeywordDebounced(keyword)
+    }, 350)
+
+    return ()=> clearTimeout(t)
+  }, [keyword])
+
+  async function fetchPage(){
     setLoading(true)
     setError(null)
     try{
-      const res = await fetcher({page, per_page: perPage, keyword})
+      // cancel previous request if any
+      if(controllerRef.current){
+        try{ controllerRef.current.abort() }catch(e){}
+      }
+      const controller = new AbortController()
+      controllerRef.current = controller
+
+      const res = await fetcher({page, limit: perPage, keyword: keywordDebounced, signal: controller.signal})
       if(Array.isArray(res)){
         setItems(res)
         setTotal(res.length)
+      } else if(res && res.data && res.paginate){
+        setItems(res.data)
+        setTotal(res.paginate.total_rows ?? res.paginate.total ?? null)
       } else if(res && res.data){
         setItems(res.data)
-        setTotal(res.meta?.total ?? res.meta?.total_records ?? null)
+        setTotal((res.data && res.data.length) || null)
       } else if(res && res.items){
         setItems(res.items)
         setTotal(res.total ?? null)
@@ -37,16 +62,23 @@ export default function PaginatedList({fetcher, renderItem, perPageOptions=[10,2
         setTotal((res && res.length) || null)
       }
     }catch(err){
+      // If request was aborted, ignore the error
+      if (err.name === 'CanceledError' || err.name === 'AbortError') {
+        return
+      }
       setError(err.message || String(err))
     }finally{
       setLoading(false)
+      // clear controller after completion
+      controllerRef.current = null
     }
   }
 
   function onSearch(e){
     e.preventDefault()
+    // immediate search when user submits form
     setPage(1)
-    load()
+    setKeywordDebounced(keyword)
   }
 
   const totalPages = total ? Math.max(1, Math.ceil(total / perPage)) : null

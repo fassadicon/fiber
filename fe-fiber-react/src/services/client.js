@@ -2,21 +2,28 @@ import axios from 'axios'
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
 
-async function request(path, {method='GET', body, token} = {}){
+async function request(path, {method='GET', body, token, signal} = {}){
   const opts = {
     url: `${API_BASE}${path}`,
     method,
     headers: {},
-    data: body
+    data: body,
   }
   if(token) opts.headers.Authorization = `Bearer ${token}`
+  if(signal) opts.signal = signal
 
   try{
     const res = await axios(opts)
     const data = res.data
+    // If response contains pagination meta, return both data and paginate
+    if (data && (Object.prototype.hasOwnProperty.call(data, 'paginate') || Object.prototype.hasOwnProperty.call(data, 'Paginate'))) {
+      return { data: data.data, paginate: data.paginate || data.Paginate }
+    }
+
     if (data && Object.prototype.hasOwnProperty.call(data, 'data')) {
       return data.data
     }
+
     return data
   }catch(e){
     const msg = e.response?.data?.message || e.message || 'Request failed'
@@ -49,12 +56,12 @@ export async function getUsers(token){
 // Note: Product CRUD removed per request
 
 // Client CRUD helpers (client GUID-based in backend)
-export async function listClients({token, page=1, per_page=10, keyword='' } = {}){
+export async function listClients({token, page=1, per_page=10, keyword='', signal } = {}){
   const q = new URLSearchParams()
   if(page) q.set('page', page)
-  if(per_page) q.set('per_page', per_page)
+  if(per_page) q.set('limit', per_page)
   if(keyword) q.set('keyword', keyword)
-  return request('/api/client?' + q.toString(), {token})
+  return request('/api/client?' + q.toString(), {token, signal})
 }
 
 export async function getClient(guid, token){

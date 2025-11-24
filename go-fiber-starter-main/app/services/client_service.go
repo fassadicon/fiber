@@ -17,13 +17,15 @@ func (s *ClientService) repo() *repository.ClientRepository {
 }
 
 func (s *ClientService) List(ctx *fiber.Ctx) error {
-	var items []models.Client
-	if err := repository.DB.Find(&items).Error; err != nil {
+	paginate := utils.GetPaginationParams(ctx)
+	paginationData, err := s.repo().GetAll(paginate)
+	if err != nil {
 		return utils.JsonErrorInternal(ctx, err, "E_CLIENT_LIST")
 	}
 
-	rows := transformer.ClientListTransformer(items)
-	return utils.JsonSuccess(ctx, rows)
+	clients := paginationData.Rows.([]models.Client)
+	paginationData.Rows = transformer.ClientListTransformer(clients)
+	return utils.JsonPagination(ctx, paginationData)
 }
 
 func (s *ClientService) Add(ctx *fiber.Ctx, req dto.ClientRequestDTO) error {

@@ -24,8 +24,14 @@ func Setup(app *fiber.App) {
 	}))
 
 	// limit repeated requests
-	maxRequest, _ := strconv.Atoi(os.Getenv("APP_MAX_REQUEST"))
-	app.Use(Limit(maxRequest, 5))
+	// In debug mode we skip the limiter to avoid blocking local development.
+	debug, _ := strconv.ParseBool(os.Getenv("APP_DEBUG"))
+	if !debug {
+		maxRequest, _ := strconv.Atoi(os.Getenv("APP_MAX_REQUEST"))
+		if maxRequest > 0 {
+			app.Use(Limit(maxRequest, 5))
+		}
+	}
 
 	// http request logger
 	app.Use(logger.New(logger.Config{
@@ -34,7 +40,6 @@ func Setup(app *fiber.App) {
 	}))
 
 	// debugger
-	debug, _ := strconv.ParseBool(os.Getenv("APP_DEBUG"))
 	if debug {
 		app.Use(pprof.New())
 	}
