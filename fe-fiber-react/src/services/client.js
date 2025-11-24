@@ -1,27 +1,29 @@
+import axios from 'axios'
+
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080'
 
 async function request(path, {method='GET', body, token} = {}){
-  const headers = {'Content-Type':'application/json'}
-  if(token) headers['Authorization'] = `Bearer ${token}`
-  const opts = {method, headers}
-  if(body) opts.body = JSON.stringify(body)
+  const opts = {
+    url: `${API_BASE}${path}`,
+    method,
+    headers: {},
+    data: body
+  }
+  if(token) opts.headers.Authorization = `Bearer ${token}`
 
-  const res = await fetch(`${API_BASE}${path}`, opts)
-  let data
-  try{ data = await res.json() }catch(e){ data = await res.text() }
-  if(!res.ok){
-    const err = new Error(data?.message || res.statusText || 'Request failed')
-    err.response = data
+  try{
+    const res = await axios(opts)
+    const data = res.data
+    if (data && Object.prototype.hasOwnProperty.call(data, 'data')) {
+      return data.data
+    }
+    return data
+  }catch(e){
+    const msg = e.response?.data?.message || e.message || 'Request failed'
+    const err = new Error(msg)
+    err.response = e.response?.data || null
     throw err
   }
-
-  // The Go backend wraps responses as { success, status, message, data }
-  // Unwrap and return the `data` field when present so callers get the payload directly.
-  if (data && Object.prototype.hasOwnProperty.call(data, 'data')) {
-    return data.data
-  }
-
-  return data
 }
 
 export async function login({email, password}){
@@ -45,4 +47,57 @@ export async function getUsers(token){
   return request('/api/user', {token})
 }
 
-export default {login, register, getProducts, getNews, getUsers}
+// Products CRUD helpers
+export async function listProducts({token, page=1, per_page=10, keyword='' } = {}){
+  const q = new URLSearchParams()
+  if(page) q.set('page', page)
+  if(per_page) q.set('per_page', per_page)
+  if(keyword) q.set('keyword', keyword)
+  return request('/api/product?' + q.toString(), {token})
+}
+
+export async function getProduct(id, token){
+  return request(`/api/product/${id}`, {token})
+}
+
+export async function createProduct(payload, token){
+  return request('/api/product', {method:'POST', body: payload, token})
+}
+
+export async function updateProduct(id, payload, token){
+  return request(`/api/product/${id}`, {method:'PUT', body: payload, token})
+}
+
+export async function deleteProduct(id, token){
+  return request(`/api/product/${id}`, {method:'DELETE', token})
+}
+
+// Client CRUD helpers (client GUID-based in backend)
+export async function listClients({token, page=1, per_page=10, keyword='' } = {}){
+  const q = new URLSearchParams()
+  if(page) q.set('page', page)
+  if(per_page) q.set('per_page', per_page)
+  if(keyword) q.set('keyword', keyword)
+  return request('/api/client?' + q.toString(), {token})
+}
+
+export async function getClient(guid, token){
+  return request(`/api/client/${guid}`, {token})
+}
+
+export async function createClient(payload, token){
+  return request('/api/client', {method:'POST', body: payload, token})
+}
+
+export async function updateClient(guid, payload, token){
+  return request(`/api/client/${guid}`, {method:'PUT', body: payload, token})
+}
+
+export async function deleteClient(guid, token){
+  return request(`/api/client/${guid}`, {method:'DELETE', token})
+}
+
+export default {login, register, getProducts, getNews, getUsers,
+  listProducts, getProduct, createProduct, updateProduct, deleteProduct,
+  listClients, getClient, createClient, updateClient, deleteClient
+}
